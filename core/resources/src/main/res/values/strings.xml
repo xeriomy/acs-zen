@@ -194,6 +194,9 @@
   <string name="no_projects_match_search">No projects match your search.</string>
   <string name="browse_other_location">Browse Other Location</string>
   <string name="recent_badge">Recent</string>
+  <string name="home_recent_projects">Recent projects</string>
+  <string name="home_view_all">View all</string>
+  <string name="home_more_options">More options</string>
   
   <string name="delete_project_title">Delete Project?</string>
   <string name="delete_project_message">Are you sure you want to delete \"%1$s\"?\n\nThis will permanently delete all files in this project. This action cannot be undone.</string>

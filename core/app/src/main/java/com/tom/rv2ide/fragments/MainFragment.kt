@@ -106,41 +106,107 @@ class MainFragment : BaseFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val actions =
-        MainScreenAction.all().also { actions ->
-          val onClick = { action: MainScreenAction, _: View ->
-            when (action.id) {
-              MainScreenAction.ACTION_CREATE_PROJECT -> showCreateProject()
-              MainScreenAction.ACTION_OPEN_PROJECT -> showProjectsBottomSheet()
-              MainScreenAction.ACTION_CLONE_REPO -> showGitCloneBottomSheet()
-              MainScreenAction.ACTION_OPEN_TERMINAL ->
-                  startActivity(Intent(requireActivity(), TerminalActivity::class.java))
+    val actions = MainScreenAction.all()
+    val onClick = { action: MainScreenAction, _: View ->
+      when (action.id) {
+        MainScreenAction.ACTION_CREATE_PROJECT -> showCreateProject()
+        MainScreenAction.ACTION_OPEN_PROJECT -> showProjectsBottomSheet()
+        MainScreenAction.ACTION_CLONE_REPO -> showGitCloneBottomSheet()
+        MainScreenAction.ACTION_OPEN_TERMINAL ->
+            startActivity(Intent(requireActivity(), TerminalActivity::class.java))
 
-              MainScreenAction.ACTION_PREFERENCES -> gotoPreferences()
-              MainScreenAction.ACTION_DONATE -> {
-                startActivity(Intent(requireActivity(), IDEConfigurations::class.java))
+        MainScreenAction.ACTION_PREFERENCES -> gotoPreferences()
+        MainScreenAction.ACTION_DONATE -> {
+          startActivity(Intent(requireActivity(), IDEConfigurations::class.java))
+        }
+        MainScreenAction.ACTION_DOCS -> BaseApplication.getBaseInstance().openDocs()
+      }
+    }
+
+    actions.forEach { action ->
+      action.onClick = onClick
+
+      if (action.id == MainScreenAction.ACTION_OPEN_TERMINAL) {
+        action.onLongClick = { _: MainScreenAction, _: View ->
+          val intent =
+              Intent(requireActivity(), TerminalActivity::class.java).apply {
+                putExtra(TERMUX_ACTIVITY.EXTRA_FAILSAFE_SESSION, true)
               }
-              MainScreenAction.ACTION_DOCS -> BaseApplication.getBaseInstance().openDocs()
-            }
-          }
+          startActivity(intent)
+          true
+        }
+      }
+    }
 
-          actions.forEach { action ->
-            action.onClick = onClick
+    val createAction = actions.first { it.id == MainScreenAction.ACTION_CREATE_PROJECT }
+    binding!!.actionCreateProject.setOnClickListener {
+      createAction.onClick?.invoke(createAction, it)
+    }
 
-            if (action.id == MainScreenAction.ACTION_OPEN_TERMINAL) {
-              action.onLongClick = { _: MainScreenAction, _: View ->
-                val intent =
-                    Intent(requireActivity(), TerminalActivity::class.java).apply {
-                      putExtra(TERMUX_ACTIVITY.EXTRA_FAILSAFE_SESSION, true)
-                    }
-                startActivity(intent)
-                true
-              }
-            }
-          }
+    binding!!.actions.adapter =
+        MainActionsListAdapter(
+            actions.filter {
+              it.id == MainScreenAction.ACTION_OPEN_PROJECT ||
+                  it.id == MainScreenAction.ACTION_CLONE_REPO ||
+                  it.id == MainScreenAction.ACTION_OPEN_TERMINAL
+            })
+    binding!!.moreActions.adapter =
+        MainActionsListAdapter(
+            actions.filter {
+              it.id == MainScreenAction.ACTION_PREFERENCES ||
+                  it.id == MainScreenAction.ACTION_DONATE ||
+                  it.id == MainScreenAction.ACTION_DOCS
+            })
+    binding!!.btnViewAllProjects.setOnClickListener { showProjectsBottomSheet() }
+
+    loadRecentProjects()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    loadRecentProjects()
+  }
+
+  private fun loadRecentProjects() {
+    val binding = binding ?: return
+    val recent = collectProjectDirs().take(3)
+    if (recent.isEmpty()) {
+      binding.recentSection.visibility = View.GONE
+      return
+    }
+    binding.recentSection.visibility = View.VISIBLE
+    binding.recentList.layoutManager = LinearLayoutManager(requireContext())
+    binding.recentList.adapter = RecentProjectsAdapter(recent, onProjectClick = { openProject(it) })
+  }
+
+  private fun collectProjectDirs(): List<File> {
+    val projectDirProjects =
+        GeneralFileUtils.listDirsInDirectory(Environment.PROJECTS_DIR).filter {
+          isValidAndroidProject(it)
         }
 
-    binding!!.actions.adapter = MainActionsListAdapter(actions)
+    val recentProjectPaths = WizardPreferences.getRecentProjects(requireContext())
+    val recentProjectFiles =
+        recentProjectPaths.mapNotNull { path ->
+          val file = File(path)
+          if (file.exists() && file.isDirectory && isValidAndroidProject(file)) file else null
+        }
+
+    val allProjectsMap = mutableMapOf<String, File>()
+
+    recentProjectFiles.forEach { file -> allProjectsMap[file.absolutePath] = file }
+
+    projectDirProjects.forEach { file -> allProjectsMap[file.absolutePath] = file }
+
+    return allProjectsMap.values
+        .toList()
+        .sortedWith(
+            compareBy<File> { project ->
+                  val recentIndex = recentProjectPaths.indexOf(project.absolutePath)
+                  if (recentIndex >= 0) recentIndex else Int.MAX_VALUE
+                }
+                .thenByDescending { it.lastModified() }
+        )
   }
 
   override fun onDestroyView() {
@@ -160,34 +226,7 @@ class MainFragment : BaseFragment() {
 
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-    val projectDirProjects =
-        GeneralFileUtils.listDirsInDirectory(Environment.PROJECTS_DIR).filter {
-          isValidAndroidProject(it)
-        }
-
-    val recentProjectPaths = WizardPreferences.getRecentProjects(requireContext())
-    val recentProjectFiles =
-        recentProjectPaths.mapNotNull { path ->
-          val file = File(path)
-          if (file.exists() && file.isDirectory && isValidAndroidProject(file)) file else null
-        }
-
-    val allProjectsMap = mutableMapOf<String, File>()
-
-    recentProjectFiles.forEach { file -> allProjectsMap[file.absolutePath] = file }
-
-    projectDirProjects.forEach { file -> allProjectsMap[file.absolutePath] = file }
-
-    val projectDirs =
-        allProjectsMap.values
-            .toList()
-            .sortedWith(
-                compareBy<File> { project ->
-                      val recentIndex = recentProjectPaths.indexOf(project.absolutePath)
-                      if (recentIndex >= 0) recentIndex else Int.MAX_VALUE
-                    }
-                    .thenByDescending { it.lastModified() }
-            )
+    val projectDirs = collectProjectDirs()
 
     var adapter: ProjectsListAdapter? = null
 
@@ -207,38 +246,7 @@ class MainFragment : BaseFragment() {
               },
               onProjectLongClick = { project ->
                 showProjectOptionsDialog(project) {
-                  val updatedProjectDirProjects =
-                      GeneralFileUtils.listDirsInDirectory(Environment.PROJECTS_DIR).filter {
-                        isValidAndroidProject(it)
-                      }
-                  val updatedRecentProjectPaths =
-                      WizardPreferences.getRecentProjects(requireContext())
-                  val updatedRecentProjectFiles =
-                      updatedRecentProjectPaths.mapNotNull { path ->
-                        val file = File(path)
-                        if (file.exists() && file.isDirectory && isValidAndroidProject(file)) file
-                        else null
-                      }
-
-                  val updatedAllProjectsMap = mutableMapOf<String, File>()
-                  updatedRecentProjectFiles.forEach { file ->
-                    updatedAllProjectsMap[file.absolutePath] = file
-                  }
-                  updatedProjectDirProjects.forEach { file ->
-                    updatedAllProjectsMap[file.absolutePath] = file
-                  }
-
-                  val updatedDirs =
-                      updatedAllProjectsMap.values
-                          .toList()
-                          .sortedWith(
-                              compareBy<File> { proj ->
-                                    val recentIndex =
-                                        updatedRecentProjectPaths.indexOf(proj.absolutePath)
-                                    if (recentIndex >= 0) recentIndex else Int.MAX_VALUE
-                                  }
-                                  .thenByDescending { it.lastModified() }
-                          )
+                  val updatedDirs = collectProjectDirs()
 
                   adapter?.updateProjects(updatedDirs)
 
@@ -768,6 +776,38 @@ class MainFragment : BaseFragment() {
     override fun isCancelled(): Boolean {
       return cancelled || Thread.currentThread().isInterrupted
     }
+  }
+
+  private class RecentProjectsAdapter(
+      private val projects: List<File>,
+      private val onProjectClick: (File) -> Unit,
+  ) : RecyclerView.Adapter<RecentProjectsAdapter.RecentViewHolder>() {
+
+    inner class RecentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+      val projectName: TextView = view.findViewById(R.id.projectName)
+      val projectPath: TextView = view.findViewById(R.id.projectPath)
+      val recentBadge: TextView = view.findViewById(R.id.recentBadge)
+      val root: View = view
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentViewHolder {
+      val view = LayoutInflater.from(parent.context).inflate(R.layout.item_project, parent, false)
+      return RecentViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: RecentViewHolder, position: Int) {
+      val project = projects[position]
+      holder.projectName.text = project.name
+      holder.projectPath.text = project.absolutePath
+
+      val recentRank =
+          WizardPreferences.getRecentProjectRank(holder.root.context, project.absolutePath)
+      holder.recentBadge.visibility = if (recentRank in 0..2) View.VISIBLE else View.GONE
+
+      holder.root.setOnClickListener { onProjectClick(project) }
+    }
+
+    override fun getItemCount() = projects.size
   }
 
   private class ProjectsListAdapter(

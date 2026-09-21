@@ -19,17 +19,18 @@
       android:layout_height="wrap_content"
       android:layout_weight="1"
       android:text="@string/open_project"
-      android:textSize="20sp"
-      android:textStyle="bold" />
+      android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+      android:textColor="?attr/colorOnSurface" />
 
     <com.google.android.material.button.MaterialButton
       android:id="@+id/btnBrowse"
       style="@style/Widget.Material3.Button.TonalButton"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:minHeight="48dp"
       android:contentDescription="@string/browse_other_location"
       app:icon="@drawable/ic_folder"
-      android:text="import project"
+      android:text="@string/browse"
       app:iconGravity="textStart"
       />
 
@@ -69,6 +70,8 @@
     android:layout_height="wrap_content"
     android:text="@string/no_projects_found"
     android:textAlignment="center"
+    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+    android:textColor="?attr/colorOnSurfaceVariant"
     android:padding="32dp"
     android:visibility="gone" />
 
