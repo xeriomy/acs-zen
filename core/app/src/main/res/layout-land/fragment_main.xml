@@ -39,8 +39,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
       android:id="@+id/main_image"
-      android:layout_width="90dp"
-      android:layout_height="90dp"
+      android:layout_width="72dp"
+      android:layout_height="72dp"
       android:contentDescription="@string/app_name"
       android:src="@drawable/ic_acs"
       app:shapeAppearance="@style/AppTheme.ShapeAppearance.MainFragment.Logo" />
@@ -59,7 +59,7 @@
       android:id="@+id/greetingText"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginTop="4dp"
+      android:layout_marginTop="2dp"
       android:text="@string/msg_create_new_project_greeting"
       android:textAlignment="center"
       android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
@@ -78,7 +78,9 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
-      android:padding="20dp">
+      android:paddingHorizontal="16dp"
+      android:paddingTop="16dp"
+      android:paddingBottom="24dp">
 
       <!-- Primary call to action -->
       <com.google.android.material.button.MaterialButton
@@ -92,22 +94,22 @@
         app:iconGravity="textStart"
         app:iconPadding="12dp" />
 
-      <!-- Primary actions: Open / Clone / Terminal (IDs kept) -->
+      <!-- Primary actions grid: Open + Clone side by side, Terminal full width.
+        LayoutManager is set in code (GridLayoutManager with span lookup). -->
       <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:nestedScrollingEnabled="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/layout_main_action_item" />
+        tools:listitem="@layout/layout_main_action_grid_item" />
 
       <!-- Recent projects (hidden when empty) -->
       <LinearLayout
         android:id="@+id/recentSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:orientation="vertical"
         android:visibility="gone"
         tools:visibility="visible">
@@ -150,7 +152,7 @@
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:text="@string/home_more_options"
         android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
         android:textColor="?attr/colorOnSurfaceVariant" />
@@ -159,7 +161,7 @@
         android:id="@+id/moreActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:nestedScrollingEnabled="false"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/layout_main_action_item" />

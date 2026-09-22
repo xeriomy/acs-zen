@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -143,13 +144,27 @@ class MainFragment : BaseFragment() {
       createAction.onClick?.invoke(createAction, it)
     }
 
+    val primaryActions =
+        actions.filter {
+          it.id == MainScreenAction.ACTION_OPEN_PROJECT ||
+              it.id == MainScreenAction.ACTION_CLONE_REPO ||
+              it.id == MainScreenAction.ACTION_OPEN_TERMINAL
+        }
     binding!!.actions.adapter =
         MainActionsListAdapter(
-            actions.filter {
-              it.id == MainScreenAction.ACTION_OPEN_PROJECT ||
-                  it.id == MainScreenAction.ACTION_CLONE_REPO ||
-                  it.id == MainScreenAction.ACTION_OPEN_TERMINAL
-            })
+            primaryActions,
+            R.layout.layout_main_action_grid_item,
+        )
+    // Open + Clone share a row; Terminal spans the full width below them.
+    val gridLayoutManager = GridLayoutManager(requireContext(), 2)
+    gridLayoutManager.spanSizeLookup =
+        object : GridLayoutManager.SpanSizeLookup() {
+          override fun getSpanSize(position: Int): Int {
+            return if (primaryActions[position].id == MainScreenAction.ACTION_OPEN_TERMINAL) 2
+            else 1
+          }
+        }
+    binding!!.actions.layoutManager = gridLayoutManager
     binding!!.moreActions.adapter =
         MainActionsListAdapter(
             actions.filter {
