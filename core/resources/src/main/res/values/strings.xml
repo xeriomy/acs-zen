@@ -241,6 +241,7 @@
   
   <!-- ATC Options Dialog -->
   <string name="choose_template">Choose Template</string>
+  <string name="new_project_template_subtitle">Choose a template to get started.</string>
   <string name="project_configuration">Project Configuration</string>
   
   <string name="project_name">Project name</string>

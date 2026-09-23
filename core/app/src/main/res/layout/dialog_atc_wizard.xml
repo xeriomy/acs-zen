@@ -24,10 +24,17 @@
         <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/choose_template"
-          android:textAppearance="?attr/textAppearanceHeadlineSmall"
+          android:text="@string/new_project"
+          android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+
+        <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="4dp"
           android:layout_marginBottom="16dp"
-          android:gravity="center" />
+          android:text="@string/new_project_template_subtitle"
+          android:textAppearance="?attr/textAppearanceBodyMedium"
+          android:textColor="?attr/colorOnSurfaceVariant" />
 
         <androidx.recyclerview.widget.RecyclerView
           android:id="@+id/templatesGrid"
