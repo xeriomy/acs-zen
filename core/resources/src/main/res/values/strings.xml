@@ -189,6 +189,12 @@
   <string name="title_confirm_project_close">Close project</string>
 
   <string name="open_project">Open Project</string>
+  <string name="projects_title">Projects</string>
+  <string name="projects_subtitle">Open, organize and back up your projects.</string>
+  <string name="projects_close">Close</string>
+  <string name="project_action_backup">Backup project</string>
+  <string name="project_action_delete">Delete project</string>
+  <string name="project_action_rename">Rename</string>
   <string name="search_projects_hint">Search projects…</string>
   <string name="no_projects_found">No projects found.\nCreate a new project or browse to open an existing one.</string>
   <string name="no_projects_match_search">No projects match your search.</string>
