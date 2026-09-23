@@ -244,6 +244,7 @@ class AtcWizardDialog : BottomSheetDialogFragment() {
       binding.packageNameInput.setText("com.example.$packageSuffix")
 
       val isNative = Options.OPT_IS_NATIVE_CPP
+      binding.nativeSection.visibility = if (isNative) View.VISIBLE else View.GONE
       binding.useCMakeSwitch.visibility = if (isNative) View.VISIBLE else View.GONE
       binding.nativeLanguageInputLayout.visibility = if (isNative) View.VISIBLE else View.GONE
       binding.ndkVersionButton.visibility = if (isNative) View.VISIBLE else View.GONE

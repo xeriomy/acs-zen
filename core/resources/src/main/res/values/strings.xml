@@ -243,6 +243,12 @@
   <string name="choose_template">Choose Template</string>
   <string name="new_project_template_subtitle">Choose a template to get started.</string>
   <string name="project_configuration">Project Configuration</string>
+  <string name="project_details_subtitle">Set the name, package and build options for your new project.</string>
+  <string name="options_section_project">Project</string>
+  <string name="options_section_location">Location</string>
+  <string name="options_section_android">Android</string>
+  <string name="options_section_native">Native</string>
+  <string name="options_section_build">Build</string>
   
   <string name="project_name">Project name</string>
   <string name="project_location">Project location</string>
