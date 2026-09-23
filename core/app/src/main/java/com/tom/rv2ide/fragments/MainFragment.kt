@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
@@ -29,7 +30,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -238,6 +241,9 @@ class MainFragment : BaseFragment() {
     val btnBrowse =
         sheetView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnBrowse)
     val searchEditText = sheetView.findViewById<TextInputEditText>(R.id.searchEditText)
+    sheetView
+        .findViewById<View>(R.id.btnCloseProjects)
+        ?.setOnClickListener { bottomSheet.dismiss() }
 
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -307,25 +313,70 @@ class MainFragment : BaseFragment() {
   }
 
   private fun showProjectOptionsDialog(project: File, onActionComplete: () -> Unit) {
-    val options = arrayOf("Backup project", "Delete project", "Rename")
+    val context = requireContext()
+    val sheet = BottomSheetDialog(context)
 
-    val builder = DialogUtils.newMaterialDialogBuilder(requireContext())
-    builder.setTitle(project.name)
-    builder.setItems(options) { dialog, which ->
-      when (which) {
-        0 -> {
-          backupProject(project, onActionComplete)
+    val padding = (16 * context.resources.displayMetrics.density).toInt()
+    val container =
+        LinearLayout(context).apply {
+          orientation = LinearLayout.VERTICAL
+          setPadding(padding, padding, padding, padding + padding / 2)
         }
-        1 -> {
-          showDeleteProjectConfirmation(project, onActionComplete)
+
+    val title =
+        TextView(context).apply {
+          text = project.name
+          setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium)
+          setPadding(padding / 2, 0, padding / 2, padding / 2)
         }
-        2 -> {
-          showRenameDialog(project, onActionComplete)
-        }
-      }
-      dialog.dismiss()
+    container.addView(title)
+
+    fun addActionRow(text: String, isDestructive: Boolean, onClick: () -> Unit) {
+      val button =
+          MaterialButton(
+              context,
+              null,
+              androidx.appcompat.R.attr.borderlessButtonStyle,
+          )
+              .apply {
+            this.text = text
+            textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+            gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
+            minHeight = (56 * context.resources.displayMetrics.density).toInt()
+            layoutParams =
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+            if (isDestructive) {
+              setTextColor(
+                  MaterialColors.getColor(
+                      this,
+                      androidx.appcompat.R.attr.colorError,
+                  )
+              )
+            }
+            setOnClickListener {
+              sheet.dismiss()
+              onClick()
+            }
+          }
+      container.addView(button)
     }
-    builder.show()
+
+    // Same targets as before; only the presentation changed.
+    addActionRow(getString(string.project_action_backup), false) {
+      backupProject(project, onActionComplete)
+    }
+    addActionRow(getString(string.project_action_rename), false) {
+      showRenameDialog(project, onActionComplete)
+    }
+    addActionRow(getString(string.project_action_delete), true) {
+      showDeleteProjectConfirmation(project, onActionComplete)
+    }
+
+    sheet.setContentView(container)
+    sheet.show()
   }
 
   private fun showRenameDialog(project: File, onComplete: () -> Unit) {
@@ -801,7 +852,7 @@ class MainFragment : BaseFragment() {
     inner class RecentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
       val projectName: TextView = view.findViewById(R.id.projectName)
       val projectPath: TextView = view.findViewById(R.id.projectPath)
-      val recentBadge: TextView = view.findViewById(R.id.recentBadge)
+      val recentBadgeContainer: View = view.findViewById(R.id.recentBadgeContainer)
       val root: View = view
     }
 
@@ -817,7 +868,8 @@ class MainFragment : BaseFragment() {
 
       val recentRank =
           WizardPreferences.getRecentProjectRank(holder.root.context, project.absolutePath)
-      holder.recentBadge.visibility = if (recentRank in 0..2) View.VISIBLE else View.GONE
+      holder.recentBadgeContainer.visibility =
+          if (recentRank in 0..2) View.VISIBLE else View.GONE
 
       holder.root.setOnClickListener { onProjectClick(project) }
     }
@@ -836,7 +888,7 @@ class MainFragment : BaseFragment() {
     inner class ProjectViewHolder(view: View) : RecyclerView.ViewHolder(view) {
       val projectName: TextView = view.findViewById(R.id.projectName)
       val projectPath: TextView = view.findViewById(R.id.projectPath)
-      val recentBadge: TextView = view.findViewById(R.id.recentBadge)
+      val recentBadgeContainer: View = view.findViewById(R.id.recentBadgeContainer)
       val root: View = view
     }
 
@@ -853,7 +905,7 @@ class MainFragment : BaseFragment() {
       val recentRank =
           WizardPreferences.getRecentProjectRank(holder.root.context, project.absolutePath)
       val isRecent = recentRank in 0..2 // Top 3 most recent projects
-      holder.recentBadge.visibility = if (isRecent) View.VISIBLE else View.GONE
+      holder.recentBadgeContainer.visibility = if (isRecent) View.VISIBLE else View.GONE
 
       holder.root.setOnClickListener { onProjectClick(project) }
 
