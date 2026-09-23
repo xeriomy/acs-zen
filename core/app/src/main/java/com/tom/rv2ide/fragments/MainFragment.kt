@@ -336,7 +336,7 @@ class MainFragment : BaseFragment() {
           MaterialButton(
               context,
               null,
-              com.google.android.material.R.attr.materialButtonTextButtonStyle,
+              androidx.appcompat.R.attr.borderlessButtonStyle,
           )
               .apply {
             this.text = text
@@ -352,7 +352,7 @@ class MainFragment : BaseFragment() {
               setTextColor(
                   MaterialColors.getColor(
                       this,
-                      com.google.android.material.R.attr.colorError,
+                      androidx.appcompat.R.attr.colorError,
                   )
               )
             }
