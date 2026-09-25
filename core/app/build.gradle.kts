@@ -50,7 +50,7 @@ tasks.configureEach {
 
 configurations.all {
   resolutionStrategy {
-    force("com.google.guava:guava:32.1.3-android")
+    force("com.google.guava:guava:33.7.1-android")
     eachDependency {
       if (requested.group == "com.google.guava" && requested.name == "guava") {
         if (requested.version?.contains("jre") == true) {
@@ -188,7 +188,7 @@ dependencies {
   // debugImplementation(libs.common.leakcanary)
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
   implementation("org.tukaani:xz:1.9")
-  implementation("org.apache.commons:commons-compress:1.21")
+  implementation("org.apache.commons:commons-compress:1.26.0")
 
   // external deps here
   implementation("com.github.Dimezis:BlurView:version-3.2.0")
