@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -24,6 +25,9 @@ class GitClientFragment : Fragment() {
     private val viewModel: GitViewModel by activityViewModels()
     
     private var hasInitialized = false
+    
+    /** Whether the Git panel currently takes the whole window instead of the side panel. */
+    private var isPanelExpanded = false
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,6 +75,56 @@ class GitClientFragment : Fragment() {
                 binding.textRepoBranch.visibility = View.VISIBLE
             }
         }
+        
+        binding.buttonExpand.setOnClickListener {
+            setPanelExpanded(!isPanelExpanded)
+        }
+        updateExpandButton()
+    }
+    
+    /**
+     * Expands or collapses the Git side panel.
+     *
+     * The panel is the navigation view that hosts this fragment inside the
+     * editor drawer. Expanding only widens that existing view to the full
+     * window and collapses it back to its normal wrap-content width, so the
+     * fragment, the pager and the selected tab all keep their state - no new
+     * navigation or state container is introduced.
+     */
+    private fun setPanelExpanded(expand: Boolean) {
+        if (expand == isPanelExpanded) return
+        
+        val drawer = activity?.findViewById<DrawerLayout>(R.id.editor_drawerLayout) ?: return
+        val navView = drawer.findViewById<View>(R.id.startNav) ?: return
+        val params = navView.layoutParams as? DrawerLayout.LayoutParams ?: return
+        
+        isPanelExpanded = expand
+        params.width =
+            if (expand) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
+        navView.layoutParams = params
+        drawer.requestLayout()
+        
+        updateExpandButton()
+    }
+    
+    private fun updateExpandButton() {
+        if (_binding == null) return
+        binding.buttonExpand.setImageResource(
+            if (isPanelExpanded) R.drawable.ic_collapse_panel else R.drawable.ic_expand_panel
+        )
+        val label = if (isPanelExpanded) "Collapse Git panel" else "Expand Git panel"
+        binding.buttonExpand.contentDescription = label
+        binding.buttonExpand.tooltipText = label
+    }
+    
+    /** Restores the normal side panel width, e.g. when another sidebar panel takes over. */
+    private fun collapsePanelIfExpanded() {
+        if (isPanelExpanded) setPanelExpanded(false)
+    }
+    
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) collapsePanelIfExpanded()
     }
     
     private fun setupObservers() {
@@ -101,6 +155,7 @@ class GitClientFragment : Fragment() {
     }
     
     private fun showInitScreen() {
+        collapsePanelIfExpanded()
         binding.repoHeader.visibility = View.GONE
         binding.navigationRail.visibility = View.GONE
         binding.viewPager.visibility = View.GONE
@@ -179,6 +234,8 @@ class GitClientFragment : Fragment() {
     }
     
     override fun onDestroyView() {
+        // Never leave the editor drawer full width behind.
+        collapsePanelIfExpanded()
         super.onDestroyView()
         _binding = null
     }
