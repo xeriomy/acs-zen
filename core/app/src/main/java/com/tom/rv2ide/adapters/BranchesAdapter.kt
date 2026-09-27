@@ -22,11 +22,11 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.menu.PopupMenu
 import com.tom.rv2ide.R
 import com.tom.rv2ide.databinding.ItemBranchBinding
 
@@ -66,7 +66,7 @@ class BranchesAdapter(
             binding.textBranchName.setTypeface(null, if (isCurrentBranch) Typeface.BOLD else Typeface.NORMAL)
             binding.textBranchName.setTextColor(
                 resolveThemeColor(view, if (isCurrentBranch) R.attr.colorPrimary else R.attr.colorOnSurface)
-                    ?: binding.textBranchName.currentTextColors.defaultColor
+                    ?: binding.textBranchName.currentTextColor
             )
             
             // A dot marks the checked out branch; other rows keep the same
@@ -82,7 +82,7 @@ class BranchesAdapter(
             
             binding.buttonMore.setOnClickListener { anchor ->
                 val popup = PopupMenu(view.context, anchor)
-                popup.menuInflater.inflate(R.menu.branch_row_actions, popup.menu)
+                popup.inflate(R.menu.branch_row_actions)
                 popup.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
                         R.id.action_checkout -> {
