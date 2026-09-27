@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.tom.rv2ide.R
 import com.tom.rv2ide.adapters.RemotesAdapter
@@ -115,11 +114,10 @@ class RemotesFragment : Fragment() {
     }
     
     private fun showResult(success: Boolean, message: String) {
-        Snackbar.make(
-            binding.root,
+        binding.root.showGitFeedback(
             message,
-            if (success) Snackbar.LENGTH_SHORT else Snackbar.LENGTH_LONG
-        ).show()
+            if (success) GitFeedbackStyle.SUCCESS else GitFeedbackStyle.ERROR
+        )
     }
 
     private fun setupButtons() {
@@ -144,14 +142,6 @@ class RemotesFragment : Fragment() {
         }
     }
     
-    private fun showErrorDialog(title: String, message: String) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton("OK", null)
-            .show()
-    }
-    
     private fun showAddRemoteDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_remote, null)
         val editTextName = dialogView.findViewById<TextInputEditText>(R.id.editTextRemoteName)
@@ -171,7 +161,7 @@ class RemotesFragment : Fragment() {
                 if (name.isNotBlank() && url.isNotBlank()) {
                     viewModel.addRemote(name, url)
                 } else {
-                    showErrorDialog("Invalid Input", "Name and URL cannot be empty")
+                    binding.root.showGitFeedback("Name and URL cannot be empty", GitFeedbackStyle.ERROR)
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -181,7 +171,7 @@ class RemotesFragment : Fragment() {
     private fun showPushDialog() {
         val remotesList = adapter.currentList
         if (remotesList.isEmpty()) {
-            showErrorDialog("No Remotes", "No remotes configured. Add a remote first.")
+            binding.root.showGitFeedback("No remotes configured. Add a remote first.", GitFeedbackStyle.ERROR)
             return
         }
         
@@ -222,7 +212,7 @@ class RemotesFragment : Fragment() {
     private fun showPullDialog() {
         val remotesList = adapter.currentList
         if (remotesList.isEmpty()) {
-            showErrorDialog("No Remotes", "No remotes configured. Add a remote first.")
+            binding.root.showGitFeedback("No remotes configured. Add a remote first.", GitFeedbackStyle.ERROR)
             return
         }
         
@@ -262,7 +252,7 @@ class RemotesFragment : Fragment() {
     private fun showFetchDialog() {
         val remotesList = adapter.currentList
         if (remotesList.isEmpty()) {
-            showErrorDialog("No Remotes", "No remotes configured. Add a remote first.")
+            binding.root.showGitFeedback("No remotes configured. Add a remote first.", GitFeedbackStyle.ERROR)
             return
         }
         

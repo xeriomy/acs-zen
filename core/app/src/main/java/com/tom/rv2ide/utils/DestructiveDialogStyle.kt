@@ -31,19 +31,34 @@ import androidx.core.content.ContextCompat
  */
 
 /**
- * Colors the confirm button of a destructive dialog (delete branch, remove
- * remote, discard changes) with the theme's error color so that it cannot be
- * mistaken for a routine action.
+ * Styles a destructive confirmation dialog (delete branch, discard changes,
+ * remove remote, clear credentials): the confirm button is filled with the
+ * theme's error color and its label switches to the matching on-error color so
+ * the action cannot be mistaken for a routine one while staying readable.
+ *
+ * The dialog itself, its title, its message and its callbacks are untouched.
  */
 fun AlertDialog.styleAsDestructive() {
     val typedValue = TypedValue()
     if (!context.theme.resolveAttribute(androidx.appcompat.R.attr.colorError, typedValue, true)) return
-    
+
     val colorStateList = if (typedValue.resourceId != 0) {
         ContextCompat.getColorStateList(context, typedValue.resourceId)
     } else {
         ColorStateList.valueOf(typedValue.data)
     }
-    
-    colorStateList?.let { getButton(AlertDialog.BUTTON_POSITIVE).backgroundTintList = it }
+
+    val confirmButton = getButton(AlertDialog.BUTTON_POSITIVE)
+    colorStateList?.let { confirmButton.backgroundTintList = it }
+
+    // Keep the label legible on top of the error-colored background.
+    val onError = TypedValue()
+    if (context.theme.resolveAttribute(com.tom.rv2ide.R.attr.colorOnError, onError, true)) {
+        val color = if (onError.resourceId != 0) {
+            ContextCompat.getColor(context, onError.resourceId)
+        } else {
+            onError.data
+        }
+        confirmButton.setTextColor(color)
+    }
 }

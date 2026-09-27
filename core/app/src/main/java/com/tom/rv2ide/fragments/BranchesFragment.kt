@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.tom.rv2ide.R
 import com.tom.rv2ide.adapters.BranchesAdapter
@@ -103,7 +102,10 @@ class BranchesFragment : Fragment() {
         }
         
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
-            Snackbar.make(binding.root, result.message, Snackbar.LENGTH_SHORT).show()
+            binding.root.showGitFeedback(
+                result.message,
+                if (result.success) GitFeedbackStyle.SUCCESS else GitFeedbackStyle.ERROR
+            )
             if (result.success) {
                 viewModel.refreshBranches()
             }
@@ -132,7 +134,7 @@ class BranchesFragment : Fragment() {
                 if (branchName.isNotBlank()) {
                     viewModel.createBranch(branchName)
                 } else {
-                    Snackbar.make(binding.root, "Branch name cannot be empty", Snackbar.LENGTH_SHORT).show()
+                    binding.root.showGitFeedback("Branch name cannot be empty", GitFeedbackStyle.ERROR)
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -141,7 +143,7 @@ class BranchesFragment : Fragment() {
     
     private fun showDeleteConfirmation(branch: String) {
         if (branch == currentBranch) {
-            Snackbar.make(binding.root, "Cannot delete current branch", Snackbar.LENGTH_SHORT).show()
+            binding.root.showGitFeedback("Cannot delete current branch", GitFeedbackStyle.ERROR)
             return
         }
         

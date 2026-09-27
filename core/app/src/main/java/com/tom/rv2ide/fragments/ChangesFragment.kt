@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.tom.rv2ide.R
 import com.tom.rv2ide.adapters.FileChangesAdapter
@@ -67,7 +66,10 @@ class ChangesFragment : Fragment() {
             binding.fabCommit.visibility = if (stagedCount > 0) View.VISIBLE else View.GONE
         }
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
-            Snackbar.make(binding.root, result.message, Snackbar.LENGTH_SHORT).show()
+            binding.root.showGitFeedback(
+                result.message,
+                if (result.success) GitFeedbackStyle.SUCCESS else GitFeedbackStyle.ERROR
+            )
         }
         
         viewModel.progressMessage.observe(viewLifecycleOwner) { message ->
@@ -94,7 +96,7 @@ class ChangesFragment : Fragment() {
                     val email = prefsManager.getGitUserEmail()
                     viewModel.commit(message, author, email)
                 } else {
-                    Snackbar.make(binding.root, "Commit message cannot be empty", Snackbar.LENGTH_SHORT).show()
+                    binding.root.showGitFeedback("Commit message cannot be empty", GitFeedbackStyle.ERROR)
                 }
             }
             .setNegativeButton("Cancel", null)
