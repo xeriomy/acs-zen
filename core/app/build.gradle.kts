@@ -42,8 +42,20 @@ buildscript {
   }
 }
 
+// AGP's file-dependency desugaring task (`desugar<Variant>FileDependencies`) is disabled
+// in this project; CI pre-creates its output directory instead
+// (see the "Generating missing dirs" step in .github/workflows/asm_build.yml).
+//
+// The match below is deliberately narrow. AGP also has tasks named
+// `l8DexDesugarLib<Variant>`, which contain "Desugar" as well, and those must keep
+// running: they produce the `desugar_jdk_libs` runtime dex that PackageAndroidArtifact
+// packs into the APK whenever core library desugaring is enabled. With them disabled the
+// APK contains no `j$` classes at all, so every desugared JDK call throws at runtime,
+// e.g. JGit's `java.util.stream.Collectors.toUnmodifiableList()` (used by
+// `RefDirectory.getRefsByPrefix(varargs)`, i.e. `ListMode.ALL` branch listing) fails with
+// `NoClassDefFoundError: j$.util.stream.DesugarCollectors`.
 tasks.configureEach {
-    if (name.contains("desugar", ignoreCase = true)) {
+    if (name.startsWith("desugar") && name.endsWith("FileDependencies")) {
         enabled = false
     }
 }
