@@ -83,24 +83,26 @@ class RemotesFragment : Fragment() {
     private fun setupObservers() {
         viewModel.remotes.observe(viewLifecycleOwner) { remotes ->
             adapter.submitList(remotes)
-            binding.emptyStateText.visibility = if (remotes.isEmpty()) View.VISIBLE else View.GONE
-            binding.recyclerViewRemotes.visibility = if (remotes.isEmpty()) View.GONE else View.VISIBLE
+            
+            binding.progressState.visibility = View.GONE
+            val isEmpty = remotes.isEmpty()
+            binding.recyclerViewRemotes.visibility = if (isEmpty) View.GONE else View.VISIBLE
+            binding.emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            
+            // Push/pull/fetch always act on the first configured remote - make
+            // that target explicit instead of leaving it to be guessed.
+            binding.textScreenSubtitle.text = remotes.firstOrNull()?.let { remote ->
+                "Push, pull and fetch use \"${remote.name}\""
+            } ?: ""
+            binding.textScreenSubtitle.visibility = if (isEmpty) View.GONE else View.VISIBLE
         }
         
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
-            if (!result.success) {
-                showErrorDialog("Operation Failed", result.message)
-            } else {
-                Snackbar.make(binding.root, result.message, Snackbar.LENGTH_SHORT).show()
-            }
+            showResult(result.success, result.message)
         }
         
         viewModel.pushPullResult.observe(viewLifecycleOwner) { result ->
-            if (!result.success) {
-                showErrorDialog("${result.operation.capitalize()} Failed", result.message)
-            } else {
-                Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
-            }
+            showResult(result.success, result.message)
         }
         
         viewModel.progressMessage.observe(viewLifecycleOwner) { message ->
@@ -110,6 +112,14 @@ class RemotesFragment : Fragment() {
                 progressDialog.dismiss()
             }
         }
+    }
+    
+    private fun showResult(success: Boolean, message: String) {
+        Snackbar.make(
+            binding.root,
+            message,
+            if (success) Snackbar.LENGTH_SHORT else Snackbar.LENGTH_LONG
+        ).show()
     }
 
     private fun setupButtons() {
@@ -299,6 +309,7 @@ class RemotesFragment : Fragment() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+            .styleAsDestructive()
     }
     
     override fun onDestroyView() {

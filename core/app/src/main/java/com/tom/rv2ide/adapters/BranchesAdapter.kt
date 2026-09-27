@@ -17,6 +17,7 @@
 package com.tom.rv2ide.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -57,6 +58,7 @@ class BranchesAdapter(
             val isCurrentBranch = branch == getCurrentBranch()
             
             binding.textBranchName.text = branch
+            binding.textCurrentBadge.visibility = if (isCurrentBranch) View.VISIBLE else View.GONE
             
             if (isCurrentBranch) {
                 val typedValue = TypedValue()

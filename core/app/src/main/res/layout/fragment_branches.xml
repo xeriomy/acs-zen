@@ -18,27 +18,44 @@
             app:cardCornerRadius="12dp">
             
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <TextView
+                        android:id="@+id/textScreenTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Branches"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:textColorPrimary"/>
+                    
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonRefresh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Refresh"
+                        app:icon="@drawable/ic_sync"
+                        style="@style/Widget.Material3.Button.TextButton"/>
+                </LinearLayout>
                 
                 <TextView
                     android:id="@+id/textCurrentBranch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Current: main"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:gravity="center_vertical"/>
-                
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonRefresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Refresh"
-                    app:icon="@android:drawable/ic_popup_sync"
-                    style="@style/Widget.Material3.Button.TextButton"/>
+                    android:layout_marginTop="4dp"
+                    android:text="Current branch: main"
+                    android:textSize="14sp"
+                    android:textColor="?android:textColorSecondary"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
         
@@ -48,7 +65,39 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:paddingHorizontal="16dp"
+            android:paddingBottom="80dp"
             android:clipToPadding="false"/>
+        
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+            
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No branches yet"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="?android:textColorPrimary"
+                android:gravity="center"/>
+            
+            <TextView
+                android:id="@+id/emptyStateSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Create a branch to work on changes separately"
+                android:textSize="14sp"
+                android:textColor="?android:textColorSecondary"
+                android:gravity="center"/>
+        </LinearLayout>
     </LinearLayout>
     
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -58,5 +107,11 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:text="New Branch"
-        app:icon="@android:drawable/ic_input_add"/>
+        app:icon="@drawable/ic_add"/>
+    
+    <ProgressBar
+        android:id="@+id/progressState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

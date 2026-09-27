@@ -89,11 +89,16 @@ class BranchesFragment : Fragment() {
     private fun setupObservers() {
         viewModel.branches.observe(viewLifecycleOwner) { branches ->
             adapter.submitList(branches.toList())
+            
+            binding.progressState.visibility = View.GONE
+            val isEmpty = branches.isEmpty()
+            binding.recyclerViewBranches.visibility = if (isEmpty) View.GONE else View.VISIBLE
+            binding.emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
         }
         
         viewModel.currentBranch.observe(viewLifecycleOwner) { branch ->
             currentBranch = branch
-            binding.textCurrentBranch.text = "Current: $branch"
+            binding.textCurrentBranch.text = "Current branch: $branch"
             adapter.notifyDataSetChanged()
         }
         
@@ -148,6 +153,7 @@ class BranchesFragment : Fragment() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+            .styleAsDestructive()
     }
     
     override fun onDestroyView() {

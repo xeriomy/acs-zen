@@ -21,20 +21,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
                 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical">
                     
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/textScreenTitle"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Remote Operations"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:layout_weight="1"
+                        android:text="Remotes"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:textColorPrimary"/>
                     
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonRefresh"
@@ -45,60 +48,91 @@
                         style="@style/Widget.Material3.Button.TextButton"/>
                 </LinearLayout>
                 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/textScreenSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textSize="14sp"
+                    android:textColor="?android:textColorSecondary"
+                    android:visibility="gone"/>
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonPush"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/buttonPush"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Push"
-                            android:textSize="14sp"
-                            android:layout_margin="4dp"
-                            app:icon="@drawable/ic_publish"
-                            app:iconGravity="textStart"
-                            app:iconPadding="4dp"
-                            style="@style/Widget.Material3.Button.TonalButton"/>
-                        
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/buttonPull"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Pull"
-                            android:textSize="14sp"
-                            android:layout_margin="4dp"
-                            app:icon="@drawable/ic_downpull"
-                            app:iconGravity="textStart"
-                            app:iconPadding="4dp"
-                            style="@style/Widget.Material3.Button.TonalButton"/>
-                        
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/buttonFetch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Fetch"
-                            android:layout_margin="4dp"
-                            android:textSize="14sp"
-                            app:icon="@drawable/ic_sync"
-                            app:iconGravity="textStart"
-                            app:iconPadding="4dp"
-                            style="@style/Widget.Material3.Button.TonalButton"/>
-                    </LinearLayout>
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:minWidth="0dp"
+                        android:text="Push"
+                        app:icon="@drawable/ic_publish"
+                        app:iconGravity="textStart"
+                        style="@style/Widget.Material3.Button.TonalButton"/>
+                    
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonPull"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="4dp"
+                        android:minWidth="0dp"
+                        android:text="Pull"
+                        app:icon="@drawable/ic_downpull"
+                        app:iconGravity="textStart"
+                        style="@style/Widget.Material3.Button.TonalButton"/>
+                    
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonFetch"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:minWidth="0dp"
+                        android:text="Fetch"
+                        app:icon="@drawable/ic_sync"
+                        app:iconGravity="textStart"
+                        style="@style/Widget.Material3.Button.TonalButton"/>
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
         
-        <TextView
-            android:id="@+id/emptyStateText"
+        <LinearLayout
+            android:id="@+id/emptyState"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="No remotes configured\nAdd a remote to push/pull changes"
-            android:textSize="16sp"
-            android:textColor="?android:textColorSecondary"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
             android:padding="32dp"
-            android:visibility="gone"/>
+            android:visibility="gone">
+            
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No remotes"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="?android:textColorPrimary"
+                android:gravity="center"/>
+            
+            <TextView
+                android:id="@+id/emptyStateSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Add a remote to push, pull or fetch changes"
+                android:textSize="14sp"
+                android:textColor="?android:textColorSecondary"
+                android:gravity="center"/>
+        </LinearLayout>
         
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewRemotes"
@@ -106,6 +140,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:paddingHorizontal="16dp"
+            android:paddingBottom="80dp"
             android:clipToPadding="false"/>
     </LinearLayout>
     
@@ -118,4 +153,10 @@
         android:text="Add Remote"
         app:elevation="0dp"
         app:icon="@drawable/ic_add"/>
+    
+    <ProgressBar
+        android:id="@+id/progressState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

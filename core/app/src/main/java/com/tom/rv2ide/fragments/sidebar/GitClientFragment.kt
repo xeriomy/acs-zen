@@ -37,6 +37,8 @@ class GitClientFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        setupRepoHeader()
+        
         if (!hasInitialized) {
             viewModel.checkRepositoryStatus(GCProperties.userProject)
             setupObservers()
@@ -49,6 +51,24 @@ class GitClientFragment : Fragment() {
                 else -> {
                     showInitScreen()
                 }
+            }
+        }
+    }
+    
+    /**
+     * Repository context shown above the tabs: the project path and the branch
+     * that is currently checked out. Purely presentational - it only mirrors
+     * [GitViewModel] state and never triggers Git operations itself.
+     */
+    private fun setupRepoHeader() {
+        binding.textRepoPath.text = GCProperties.userProject
+        
+        viewModel.currentBranch.observe(viewLifecycleOwner) { branch ->
+            if (branch.isNullOrBlank()) {
+                binding.textRepoBranch.visibility = View.GONE
+            } else {
+                binding.textRepoBranch.text = branch
+                binding.textRepoBranch.visibility = View.VISIBLE
             }
         }
     }
@@ -81,6 +101,7 @@ class GitClientFragment : Fragment() {
     }
     
     private fun showInitScreen() {
+        binding.repoHeader.visibility = View.GONE
         binding.navigationRail.visibility = View.GONE
         binding.viewPager.visibility = View.GONE
         
@@ -93,6 +114,7 @@ class GitClientFragment : Fragment() {
     
     private fun showMainContent() {
         binding.containerInit.visibility = View.GONE
+        binding.repoHeader.visibility = View.VISIBLE
         binding.navigationRail.visibility = View.VISIBLE
         binding.viewPager.visibility = View.VISIBLE
         
