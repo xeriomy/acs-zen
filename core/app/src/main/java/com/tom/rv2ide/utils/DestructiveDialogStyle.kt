@@ -20,7 +20,6 @@ import android.content.res.ColorStateList
 import android.util.TypedValue
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import com.google.android.material.R
 
 /**
  * Presentation helpers for Git dialogs.
@@ -38,7 +37,7 @@ import com.google.android.material.R
  */
 fun AlertDialog.styleAsDestructive() {
     val typedValue = TypedValue()
-    if (!context.theme.resolveAttribute(R.attr.colorError, typedValue, true)) return
+    if (!context.theme.resolveAttribute(androidx.appcompat.R.attr.colorError, typedValue, true)) return
     
     val colorStateList = if (typedValue.resourceId != 0) {
         ContextCompat.getColorStateList(context, typedValue.resourceId)
